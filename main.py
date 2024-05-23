@@ -27,7 +27,7 @@ def process_files():
         combined_data = pd.DataFrame()
         for_now = tables.index(tabname)
         window_text_show(f"開始處理分頁-{tabname}\n")
-
+        i = 0
         for file in excel_files:
 
             window_text_show(f"處理中檔案：{file},,\n")
@@ -36,17 +36,28 @@ def process_files():
                 excel_file = pd.ExcelFile(file)
                 sheet_names = excel_file.sheet_names
 
-                df = pd.read_excel(file, sheet_name=for_now)
+                df = pd.read_excel(file, sheet_name=for_now)  # ,header=None
+
+                df.columns = [col.strip() for col in df.columns]
+
+                # print(i)
+                # if i == 0:
+                #     # 保存第一个文件的列名
+                #     standard_columns = df.columns
+                # else:
+                #     # 重命名后续文件的列为第一个文件的列名
+                #     df.columns = standard_columns
 
                 df.insert(len(df.columns), 'Tab', tabname)
                 df.insert(len(df.columns), 'File', file)
 
-                # output_text.insert(tk.END, f"\n{df.columns},,\n")
-                # output_text.update()
                 combined_data = pd.concat(
                     [combined_data, df], ignore_index=True)
-                # output_text.insert(tk.END, f"\n{combined_data.columns},,\n")
-                # output_text.update()
+                i = i+1
+
+                # window_text_show(f"\n{combined_data.columns},,\n")
+                # combined_data = pd.concat([combined_data, df], ignore_index=True)
+
             except Exception as e:
                 window_text_show(f"Error reading {file}: {str(e)}\n")
                 continue
